@@ -5,6 +5,10 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
@@ -22,15 +26,19 @@ public class SwerveDriveModule extends Subsystem {
 
     private final double mZeroOffset;
 
-    private final TalonSRX mAngleMotor;
-    private final TalonSRX mDriveMotor;
+    private final CANSparkMax mAngleMotor;
+    private final CANSparkMax mDriveMotor;
 
     private boolean driveInverted = false;
     private double driveGearRatio = 1;
     private double driveWheelRadius = 2;
     private boolean angleMotorJam = false;
 
-    public SwerveDriveModule(int moduleNumber, TalonSRX angleMotor, TalonSRX driveMotor, double zeroOffset) {
+    private int stallLimit = 40; 
+    private int freeLimit  = 40; //currentLimit
+    private int limitRPM = 10;
+
+    public SwerveDriveModule(int moduleNumber, CANSparkMax angleMotor, CANSparkMax driveMotor, double zeroOffset) {
         this.moduleNumber = moduleNumber;
 
         mAngleMotor = angleMotor;
@@ -38,6 +46,10 @@ public class SwerveDriveModule extends Subsystem {
 
         mZeroOffset = zeroOffset;
 
+        // Set amperage limits
+        angleMotor.setSmartCurrentLimit(stallLimit, freeLimit, limitRPM);
+        driveMotor.setSmartCurrentLimit(stallLimit, freeLimit, limitRPM);
+        /*
         angleMotor.configSelectedFeedbackSensor(FeedbackDevice.Analog, 0, 0);
         angleMotor.setSensorPhase(true);
         angleMotor.config_kP(0, 30, 0);
@@ -58,19 +70,13 @@ public class SwerveDriveModule extends Subsystem {
 
         driveMotor.configMotionCruiseVelocity(640, 0);
         driveMotor.configMotionAcceleration(200, 0);
+*/
+        driveMotor.setIdleMode(IdleMode.kBrake);
 
-        driveMotor.setNeutralMode(NeutralMode.Brake);
 
-        // Set amperage limits
-        angleMotor.configContinuousCurrentLimit(30, 0);
-        angleMotor.configPeakCurrentLimit(30, 0);
-        angleMotor.configPeakCurrentDuration(100, 0);
-        angleMotor.enableCurrentLimit(true);
 
-        driveMotor.configContinuousCurrentLimit(25, 0);
-        driveMotor.configPeakCurrentLimit(25, 0);
-        driveMotor.configPeakCurrentDuration(100, 0);
-        driveMotor.enableCurrentLimit(true);
+
+
         
     	SmartDashboard.putBoolean("Motor Jammed" + moduleNumber, angleMotorJam);
     }
@@ -96,7 +102,7 @@ public class SwerveDriveModule extends Subsystem {
         setDefaultCommand(new SwerveModuleCommand(this));
     }
 
-    public TalonSRX getAngleMotor() {
+    public CANSparkMax getAngleMotor() {
         return mAngleMotor;
     }
 
@@ -122,7 +128,7 @@ public class SwerveDriveModule extends Subsystem {
         return encoderTicksToInches(ticks);
     }
 
-    public TalonSRX getDriveMotor() {
+    public CANSparkMax getDriveMotor() {
         return mDriveMotor;
     }
 

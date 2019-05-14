@@ -1,9 +1,11 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-//import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SPI;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import frc.robot.subsystems.Pigeon;
+
 import frc.robot.Robot;
+
 
 import static frc.robot.RobotMap.*;
 
@@ -22,45 +24,46 @@ public class SwerveDriveSubsystem extends HolonomicDrivetrain {
 	 */
 	private SwerveDriveModule[] mSwerveModules;
 
-    ///////private AHRS mNavX = new AHRS(SPI.Port.kMXP, (byte) 200);
+    ///private AHRS mNavX = new AHRS(SPI.Port.kMXP, (byte) 200);
 
     public SwerveDriveSubsystem() {
         super(WIDTH, LENGTH);
         zeroGyro();
-
+/*
         if (Robot.PRACTICE_BOT) {
             mSwerveModules = new SwerveDriveModule[] {
-                    new SwerveDriveModule(0, new TalonSRX(3), new TalonSRX(4), 255.5859),
-                    new SwerveDriveModule(1, new TalonSRX(6), new TalonSRX(5), 338.906),
-                    new SwerveDriveModule(2, new TalonSRX(2), new TalonSRX(1), 13.359),
-                    new SwerveDriveModule(3, new TalonSRX(7), new TalonSRX(8), 15.82),
+                    new SwerveDriveModule(0, new CANSparkMax(RobotMap.DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR, MotorType.kBrushless), new CANSparkMax(4), 255.5859),
+                    new SwerveDriveModule(1, new CANSparkMax(6), new CANSparkMax(5), 338.906),
+                    new SwerveDriveModule(2, new CANSparkMax(2), new CANSparkMax(1), 13.359),
+                    new SwerveDriveModule(3, new CANSparkMax(7), new CANSparkMax(8), 15.82),
             };
 
             mSwerveModules[0].setDriveInverted(true);
             mSwerveModules[3].setDriveInverted(true);
         } else {
+            */
             mSwerveModules = new SwerveDriveModule[] {
                     new SwerveDriveModule(0,
-                            new TalonSRX(DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR),
-                            new TalonSRX(DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR),
+                            new CANSparkMax(DRIVETRAIN_FRONT_LEFT_ANGLE_MOTOR, MotorType.kBrushless),
+                            new CANSparkMax(DRIVETRAIN_FRONT_LEFT_DRIVE_MOTOR, MotorType.kBrushless),
                             87.890),
                     new SwerveDriveModule(1,
-                            new TalonSRX(DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR),
-                            new TalonSRX(DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR),
+                            new CANSparkMax(DRIVETRAIN_FRONT_RIGHT_ANGLE_MOTOR, MotorType.kBrushless),
+                            new CANSparkMax(DRIVETRAIN_FRONT_RIGHT_DRIVE_MOTOR, MotorType.kBrushless),
                             235.195),
                     new SwerveDriveModule(2,
-                            new TalonSRX(DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR),
-                            new TalonSRX(DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR),
+                            new CANSparkMax(DRIVETRAIN_BACK_RIGHT_ANGLE_MOTOR, MotorType.kBrushless),
+                            new CANSparkMax(DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR, MotorType.kBrushless),
                             320.976),
                     new SwerveDriveModule(3,
-                            new TalonSRX(DRIVETRAIn_BACK_LEFT_ANGLE_MOTOR),
-                            new TalonSRX(DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR),
+                            new CANSparkMax(DRIVETRAIn_BACK_LEFT_ANGLE_MOTOR, MotorType.kBrushless),
+                            new CANSparkMax(DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR, MotorType.kBrushless),
                             245.742),
             };
 
             mSwerveModules[0].setDriveInverted(true);
             mSwerveModules[3].setDriveInverted(true);
-        }
+
 
         for (SwerveDriveModule module : mSwerveModules) {
             module.setTargetAngle(0);
@@ -95,8 +98,12 @@ public class SwerveDriveSubsystem extends HolonomicDrivetrain {
         return mNavX;
     }
 */
+
+public double getAngle() {
+    return Pigeon.pidgey.getAbsoluteCompassHeading();
+}
     public double getGyroAngle() {
-        double angle = 0; //mNavX.getAngle() - getAdjustmentAngle();
+        double angle = getAngle() - getAdjustmentAngle();
         angle %= 360;
         if (angle < 0) angle += 360;
 
@@ -107,12 +114,15 @@ public class SwerveDriveSubsystem extends HolonomicDrivetrain {
         }
     }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public double getGyroRate() {
         return 0;//mNavX.getRate();
     }
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public double getRawGyroAngle() {
-        double angle = 0;//mNavX.getAngle();
+        double angle = getAngle();
         angle %= 360;
         if (angle < 0) angle += 360;
 
