@@ -56,7 +56,7 @@ public class SwerveDriveSubsystem extends HolonomicDrivetrain {
                             new CANSparkMax(DRIVETRAIN_BACK_RIGHT_DRIVE_MOTOR, MotorType.kBrushless),
                             320.976),
                     new SwerveDriveModule(3,
-                            new CANSparkMax(DRIVETRAIn_BACK_LEFT_ANGLE_MOTOR, MotorType.kBrushless),
+                            new CANSparkMax(DRIVETRAIN_BACK_LEFT_ANGLE_MOTOR, MotorType.kBrushless),
                             new CANSparkMax(DRIVETRAIN_BACK_LEFT_DRIVE_MOTOR, MotorType.kBrushless),
                             245.742),
             };
@@ -69,7 +69,9 @@ public class SwerveDriveSubsystem extends HolonomicDrivetrain {
             module.setTargetAngle(0);
             module.setDriveGearRatio(5.7777);
             module.setDriveWheelRadius(module.getDriveWheelRadius() * 1.05);
+            /*   removed for motion magic
             module.setMotionConstraints(getMaxAcceleration(), getMaxVelocity());
+            */
         }
     }
 

@@ -28,6 +28,8 @@ public class SwerveDriveModule extends Subsystem {
 
     private final CANSparkMax mAngleMotor;
     private final CANSparkMax mDriveMotor;
+    private CANEncoder mAngleEncoder;
+    private CANEncoder mdriveEncoder;
 
     private boolean driveInverted = false;
     private double driveGearRatio = 1;
@@ -46,6 +48,7 @@ public class SwerveDriveModule extends Subsystem {
 
         mZeroOffset = zeroOffset;
 
+        
         // Set amperage limits
         angleMotor.setSmartCurrentLimit(stallLimit, freeLimit, limitRPM);
         driveMotor.setSmartCurrentLimit(stallLimit, freeLimit, limitRPM);
@@ -112,7 +115,7 @@ public class SwerveDriveModule extends Subsystem {
      * @return An angle in the range [0, 360)
      */
     public double getCurrentAngle() {
-        double angle = mAngleMotor.getSelectedSensorPosition(0) * (360.0 / 1024.0);
+        double angle = mAngleEncoder.getPosition() * (360.0 / 1024.0);
         angle -= mZeroOffset;
         angle %= 360;
         if (angle < 0) angle += 360;
@@ -121,7 +124,7 @@ public class SwerveDriveModule extends Subsystem {
     }
 
     public double getDriveDistance() {
-        int ticks = mDriveMotor.getSelectedSensorPosition(0);
+        double ticks = mdriveEncoder.getPosition();
         if (driveInverted)
             ticks = -ticks;
 
@@ -131,6 +134,15 @@ public class SwerveDriveModule extends Subsystem {
     public CANSparkMax getDriveMotor() {
         return mDriveMotor;
     }
+
+    public CANEncoder getDriveEncoder() {
+        return mdriveEncoder;
+    }
+
+    public CANEncoder getAngleEncoder() {
+        return mAngleEncoder;
+    }
+
 
     public double getTargetAngle() {
         return lastTargetAngle;
@@ -170,7 +182,7 @@ public class SwerveDriveModule extends Subsystem {
 
         targetAngle += mZeroOffset;
 
-        double currentAngle = mAngleMotor.getSelectedSensorPosition(0) * (360.0 / 1024.0);
+        double currentAngle = mAngleEncoder.getPosition() * (360.0 / 1024.0);
         double currentAngleMod = currentAngle % 360;
         if (currentAngleMod < 0) currentAngleMod += 360;
 
@@ -245,7 +257,7 @@ public class SwerveDriveModule extends Subsystem {
     }
 
     public void zeroDistance() {
-        mDriveMotor.setSelectedSensorPosition(0, 0, 0);
+        mdriveEncoder.setPosition(0);
     }
     
     public void resetMotor() {
@@ -253,9 +265,10 @@ public class SwerveDriveModule extends Subsystem {
     	mStallTimeBegin = Long.MAX_VALUE;
     	SmartDashboard.putBoolean("Motor Jammed" + moduleNumber, angleMotorJam);
     }
-
+/*
     public void setMotionConstraints(double maxAcceleration, double maxVelocity) {
         mDriveMotor.configMotionAcceleration(inchesToEncoderTicks(maxAcceleration * 12) / 10, 0);
         mDriveMotor.configMotionCruiseVelocity(inchesToEncoderTicks(maxVelocity * 12) / 10, 0);
     }
+    */
 }
